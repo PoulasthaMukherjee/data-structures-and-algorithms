@@ -1,0 +1,191 @@
+"""
+Reconstruct BST
+
+Question:
+
+The pre-order traversal of a Binary Tree is a traversal technique that starts at the tree's root node and visits nodes in the following order:
+	Current Node
+	Left Subtree
+	Right Subtree
+
+Given a non-empty array of integers representing the pre-order traversal of a Binary Search Tree (BST), write a function that creates the relevant BST and returns its root node.
+
+The input array will contain the values of BST nodes in the order in which these nodes would be visited with a pre-order traversal.
+
+Sample Input: [10, 4, 2, 1, 5, 17, 19, 18]
+Sample Output:
+        10
+      /    \
+     4      17
+   /   \      \
+  2     5     19
+ /           /
+1           18
+
+Approach:
+- The given problem involves reconstructing a Binary Search Tree (BST) from a pre-order traversal list.
+- The pre-order traversal visits nodes in the order: Current Node, Left Subtree, Right Subtree.
+- We can leverage this property to construct the BST recursively.
+- To keep track of the current element in the pre-order traversal list, we initialize an index.
+- The first element in the pre-order list corresponds to the root of the BST.
+- By finding the first element greater than the root value, we can identify the boundary between the left and right subtrees.
+- We recursively construct the left subtree using the elements before the first greater element and the right subtree using the elements after it.
+- This process is repeated until all elements in the pre-order list are processed, resulting in the complete construction of the BST.
+
+Time Complexity: O(n), where n is the number of nodes in the BST. Each element in the pre-order traversal list is processed exactly once during the construction of the BST.
+
+Space Complexity: O(n), for the recursive function call stack. In the worst case, the height of the BST can be n, resulting in a recursive function call stack of size n.
+
+Note: The space complexity does not include the space required to store the reconstructed BST itself, as it is not additional space but a part of the inherent data structure.
+
+Readability:
+
+- The code follows a clear and consistent naming convention.
+- Proper indentation and spacing are used to enhance readability.
+- The code is divided into meaningful functions, each serving a specific purpose.
+- Comments are added to explain the logic and functionality of each section of code.
+
+Further Reading:
+
+- Binary Search Trees: https://en.wikipedia.org/wiki/Binary_search_tree
+- Pre-order Traversal: https://en.wikipedia.org/wiki/Tree_traversal#Pre-order_(NLR)
+- Tree Traversals: Exploring the Different Ways of Traversing a Tree: https://www.freecodecamp.org/news/all-you-need-to-know-about-tree-traversal-9c79ac0417db/
+
+"""
+
+class TreeNode:
+    def __init__(self, key):
+        self.key = key
+        self.right = None
+        self.left = None
+
+    def insert(self, key):
+        # Insert a new key into the BST
+        if self.key == key:
+            return
+        elif self.key < key:
+            # If the key is greater, insert it into the right subtree
+            if self.right is None:
+                # If the right subtree is empty, create a new node
+                self.right = TreeNode(key)
+            else:
+                # If the right subtree is not empty, recursively insert into the right subtree
+                self.right.insert(key)
+        # self.key > key
+        else:  
+            # If the key is smaller, insert it into the left subtree
+            if self.left is None:
+                # If the left subtree is empty, create a new node
+                self.left = TreeNode(key)
+            else:
+                # If the left subtree is not empty, recursively insert into the left subtree
+                self.left.insert(key)
+
+    def display(self):
+        """
+        Displays the Binary Search Tree (BST) in a visually appealing way.
+
+        The display is created using the _display_aux() helper method, which returns a list of strings representing
+        each line of the tree's visual representation. Each line represents a level of the tree.
+
+        The lines are then printed one by one, resulting in a formatted and visually clear representation of the BST.
+
+        This method is useful for visually inspecting the structure and arrangement of the BST.
+
+        Note: The display is dependent on the node's key values and their relative positions within the tree.
+
+        Example Output:
+               _10_     
+              /    \
+              4   17___
+             / \       \
+             2 5      19
+            /        /
+            1       18
+
+        """
+        lines, *_ = self._display_aux()
+        for line in lines:
+            print(line)
+
+    def _display_aux(self):
+        """
+        Returns list of strings, width, height, and horizontal coordinate of the root.
+        
+        """
+        # No child.
+        if self.right is None and self.left is None:
+            line = '%s' % self.key
+            width = len(line)
+            height = 1
+            middle = width // 2
+            return [line], width, height, middle
+
+        # Only left child.
+        if self.right is None:
+            lines, n, p, x = self.left._display_aux()
+            s = '%s' % self.key
+            u = len(s)
+            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
+            second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
+            shifted_lines = [line + u * ' ' for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, n + u // 2
+
+        # Only right child.
+        if self.left is None:
+            lines, n, p, x = self.right._display_aux()
+            s = '%s' % self.key
+            u = len(s)
+            first_line = s + x * '_' + (n - x) * ' '
+            second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
+            shifted_lines = [u * ' ' + line for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, u // 2
+
+        # Two children.
+        left, n, p, x = self.left._display_aux()
+        right, m, q, y = self.right._display_aux()
+        s = '%s' % self.key
+        u = len(s)
+        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
+        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
+        if p < q:
+            left += [n * ' '] * (q - p)
+        elif q < p:
+            right += [m * ' '] * (p - q)
+        zipped_lines = zip(left, right)
+        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
+        return lines, n + m + u, max(p, q) + 2, n + u // 2
+
+
+def constructBST(arr):
+    """
+    Constructs a Binary Search Tree (BST) from the given pre-order traversal list.
+
+    Args:
+        arr: A list representing the pre-order traversal of the BST.
+
+    Returns:
+        The root node of the reconstructed BST.
+    """
+    if not arr:
+        return None
+
+    # Create the root node with the first element of the array
+    root = TreeNode(arr[0])
+
+    # Insert the remaining elements into the BST
+    for i in range(1, len(arr)):
+        root.insert(arr[i])
+
+    # Return the root node of the constructed BST
+    return root
+
+
+# Test case
+arr = [10, 4, 2, 1, 5, 17, 19, 18]
+
+# Construct the BST
+bst_root = constructBST(arr)
+
+# Display the tree
+bst_root.display()
