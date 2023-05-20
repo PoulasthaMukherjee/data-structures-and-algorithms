@@ -72,7 +72,7 @@ class TreeNode:
                 # If the right subtree is not empty, recursively insert into the right subtree
                 self.right.insert(key)
         # self.key > key
-        else:  
+        else:
             # If the key is smaller, insert it into the left subtree
             if self.left is None:
                 # If the left subtree is empty, create a new node
@@ -95,7 +95,7 @@ class TreeNode:
         Note: The display is dependent on the node's key values and their relative positions within the tree.
 
         Example Output:
-               _10_     
+               _10_
               /    \
               4   17___
              / \       \
@@ -111,7 +111,7 @@ class TreeNode:
     def _display_aux(self):
         """
         Returns list of strings, width, height, and horizontal coordinate of the root.
-        
+
         """
         # No child.
         if self.right is None and self.left is None:
